@@ -59,6 +59,7 @@ namespace codal
           * @param method The method to invoke.
           */
         template <typename T> MemberFunctionCallback(T* object, void (T::*method)(Event e));
+        template <typename T> MemberFunctionCallback(T* object, void (T::*method)());
 
         /**
           * A comparison of two MemberFunctionCallback objects.
@@ -84,6 +85,15 @@ namespace codal
       */
     template <typename T>
     MemberFunctionCallback::MemberFunctionCallback(T* object, void (T::*method)(Event e))
+    {
+        this->object = object;
+        memclr(this->method, sizeof(this->method));
+        memcpy(this->method, &method, sizeof(method));
+        invoke = &MemberFunctionCallback::methodCall<T>;
+    }
+
+    template <typename T>
+    MemberFunctionCallback::MemberFunctionCallback(T* object, void (T::*method)())
     {
         this->object = object;
         memclr(this->method, sizeof(this->method));
